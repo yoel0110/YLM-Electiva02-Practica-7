@@ -1,0 +1,36 @@
+
+services:
+  web:
+    build:
+      context: ./src
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: hola_mundo
+      DB_USER: hola_user
+      DB_PASSWORD: hola_password
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: hola_mundo
+      MYSQL_USER: hola_user
+      MYSQL_PASSWORD: hola_password
+      MYSQL_ROOT_PASSWORD: root_password_cambiar
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot_password_cambiar"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
